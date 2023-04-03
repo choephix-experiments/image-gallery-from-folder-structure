@@ -19,8 +19,8 @@ const urlParams = new URLSearchParams(window.location.search);
 const URL_BASE = urlParams.get('host') ?? 'https://undroop.web.app';
 function urlWithBase(path) {
   let base = URL_BASE;
-  if (!base.startsWith("https://") && base.startsWith("http://")) base = "https://" + base;
-  if (!base.endsWith('/')) base = base + "/";
+  if (!base.startsWith('https://') && base.startsWith('http://')) base = 'https://' + base;
+  if (!base.endsWith('/')) base = base + '/';
   return base + path;
 }
 
@@ -56,6 +56,7 @@ const buildSidebar = (structure, nodeId, parentPath = '') => {
       item.path = parentPath ? `${parentPath}/${item.name}` : item.name;
 
       const folderClassName = folderContainsImage(item) ? 'with-images' : '';
+      const hasSubfolders = item.children.some(c => c.children)
 
       return (
         <TreeItem
@@ -63,7 +64,7 @@ const buildSidebar = (structure, nodeId, parentPath = '') => {
           nodeId={itemId}
           label={<span className={folderClassName}>{item.name}</span>}
         >
-          {buildSidebar(item, itemId, item.path)}
+          {hasSubfolders && buildSidebar(item, itemId, item.path)}
         </TreeItem>
       );
     } else {
@@ -127,7 +128,6 @@ function App() {
           const parentPath = folder.path.split('/');
           const path = [...parentPath, child.name];
           const url = urlWithBase(path.join('/'));
-          console.log(url)
           items.push({
             src: url,
             thumb: url,
@@ -189,6 +189,7 @@ function App() {
 
   const backgroundCss = selectedPhoto != null ? `url(${selectedPhoto.src})` : `none`;
   // console.log(selectedPhoto?.src, backgroundCss);
+  console.log(galleryItems);
 
   return (
     <div className='App'>
@@ -215,14 +216,12 @@ function App() {
            * VERSION 1
            **/}
           {/* <h1>{defaultTitle}</h1>
-          <div className='gallery-list'>
-            <PhotoAlbum
-              layout={galleryItems.length < 5 ? 'masonry' : 'rows'}
-              targetRowHeight={240}
-              onClick={handleImageClick}
-              photos={galleryItems}
-            />
-          </div> */}
+          <PhotoAlbum
+            layout={galleryItems.length < 5 ? 'masonry' : 'rows'}
+            targetRowHeight={240}
+            onClick={handleImageClick}
+            photos={galleryItems}
+          /> */}
           {/**
            * VERSION 2
            **/}
