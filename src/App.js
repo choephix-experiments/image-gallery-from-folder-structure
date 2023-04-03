@@ -8,10 +8,12 @@ import TreeItem from '@mui/lab/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-const URL_BASE = 'https://undroop.web.app/';
-const STRUCTURE_URL = URL_BASE + 'folder_structure.json';
+const urlParams = new URLSearchParams(queryString);
 
-const SHOW_FILES = false;
+const URL_BASE = urlParams.get('host') ?? 'https://undroop.web.app/';
+const STRUCTURE_URL = URL_BASE + (URL_BASE.endsWith('/') ? '' : '/') + 'folder_structure.json';
+
+const SHOW_FILES = urlParams.get('files') == '' || !!JSON.parse(urlParams.get('files'));
 
 const fetchStructure = async () => {
   const response = await fetch(STRUCTURE_URL);
@@ -19,7 +21,7 @@ const fetchStructure = async () => {
   return data;
 };
 
-const supportedImageFormats = ['png', 'webp', 'jpg'];
+const supportedImageFormats = ['png', 'webp', 'jpg', 'jpeg', 'avif'];
 const isSupportedImage = filename => {
   const extension = filename.split('.').pop().toLowerCase();
   return supportedImageFormats.includes(extension);
@@ -38,7 +40,7 @@ const buildSidebar = (structure, nodeId, parentPath = '') => {
 
     if ('children' in item) {
       item.path = parentPath ? `${parentPath}/${item.name}` : item.name;
-      
+
       const folderStyle = folderContainsImage(item) ? { color: 'blue', fontWeight: 'bold' } : {};
 
       return (
