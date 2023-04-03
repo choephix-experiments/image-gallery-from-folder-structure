@@ -32,7 +32,8 @@ body {
 
 .App {
   background: #dedede;
-  background: #191919;
+  /* background: #191919; */
+  /* background: #301d49; */
   color: grey;
 }
 
@@ -61,10 +62,11 @@ body {
 
 .panel {
   height:100%;
-  background: #ffffff25;
+  background: #ffffff20;
   border: #0003 solid 1px;
   border-radius: 8px;
   overflow-y: auto;
+  box-shadow: #0003 0px 0px 6px;
 }
 
 .sidebar {
