@@ -180,7 +180,7 @@ function App() {
   };
 
   const defaultTitle = urlWithBase(currentFolder);
-  // window.title = defaultTitle;
+  window.document.title = urlWithBase('');
 
   const handleImageClick = ({ photo }) => {
     setSelectedPhoto(photo);
@@ -188,9 +188,7 @@ function App() {
   };
 
   const backgroundCss = selectedPhoto != null ? `url(${selectedPhoto.src})` : `none`;
-  console.log(selectedPhoto?.src, backgroundCss);
-  
-  console.log(galleryItems);
+  // console.log(selectedPhoto?.src, backgroundCss);
 
   return (
     <div className='App'>
