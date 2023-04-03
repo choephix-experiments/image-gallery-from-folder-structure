@@ -9,6 +9,11 @@ import TreeView from '@mui/lab/TreeView';
 
 import PhotoAlbum from 'react-photo-album';
 
+import 'lightgallery/css/lightgallery.css';
+import { LightgalleryProvider, LightgalleryItem } from 'react-lightgallery';
+
+import Gallery from 'react-photo-gallery';
+
 const urlParams = new URLSearchParams(window.location.search);
 
 const URL_BASE = urlParams.get('host') ?? 'https://undroop.web.app/';
@@ -42,7 +47,7 @@ const buildSidebar = (structure, nodeId, parentPath = '') => {
     if ('children' in item) {
       item.path = parentPath ? `${parentPath}/${item.name}` : item.name;
 
-      const folderClassName = folderContainsImage(item) ? "with-images" : "";
+      const folderClassName = folderContainsImage(item) ? 'with-images' : '';
 
       return (
         <TreeItem
@@ -80,6 +85,7 @@ function App() {
   const [structure, setStructure] = useState(null);
   const [galleryItems, setGalleryItems] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(getCurrentPath());
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   // window.history.pushState({}, '', currentFolder ? `/${currentFolder}?${location.search}` : '/');
 
@@ -166,12 +172,16 @@ function App() {
   const defaultTitle = currentFolder || URL_BASE;
 
   const handleImageClick = ({ photo }) => {
+    setSelectedPhoto(photo);
     return navigator.clipboard.writeText(photo.src);
   };
 
+  const backgroundCss = selectedPhoto != null ? `url(${selectedPhoto.src})` : `none`; 
+  console.log(selectedPhoto?.src, backgroundCss);
+
   return (
     <div className='App'>
-      {/* <h1>{defaultTitle}</h1> */}
+      <div className='Background' style={{ background: backgroundCss }} key={backgroundCss} />
       <div className='content'>
         <div className='panel sidebar'>
           {structure && (
@@ -180,9 +190,7 @@ function App() {
               defaultExpandIcon={<ChevronRightIcon />}
               onNodeSelect={(e, value) => {
                 const node = getNodeById(structure, value);
-                if (node) {
-                  handleFolderClick(node);
-                }
+                if (node) handleFolderClick(node);
               }}
               selected={findNodeByPath(structure, currentFolder)?.id}
             >
@@ -191,15 +199,45 @@ function App() {
           )}
         </div>
         <div className='divider' />
-        <div className='panel gallery'>
+        <div className='panel gallery react_lightgallery'>
+          {/**
+           * VERSION 1
+           **/}
+          {/* <h1>{defaultTitle}</h1>
           <div className='gallery-list'>
             <PhotoAlbum
-              layout='rows'
+              layout={galleryItems.length < 5 ? 'masonry' : 'rows'}
               targetRowHeight={240}
               onClick={handleImageClick}
               photos={galleryItems}
             />
-          </div>
+          </div> */}
+          {/**
+           * VERSION 2
+           **/}
+          <LightgalleryProvider
+            plugins={[window.lgZoom, window.lgThumbnail]}
+            settings={{ mode: 'lg-fade', preload: 1 }}
+          >
+            {galleryItems.map((item, index) => (
+              <LightgalleryItem key={currentFolder + '/' + index} src={item.src} thumb={item.thumb}>
+                <img src={item.thumb} alt='' />
+              </LightgalleryItem>
+            ))}
+          </LightgalleryProvider>
+          {/**
+           * VERSION 3
+           **/}
+          {/* <Gallery
+            photos={galleryItems}
+            // layout={galleryItems.length < 5 ? 'masonry' : 'rows'}
+            // targetRowHeight={240}
+            onClick={ev => {
+              console.log(ev.target.src);
+              setSelectedPhoto({ src: ev.target.src });
+              return navigator.clipboard.writeText(ev.target.src);
+            }}
+          /> */}
         </div>
       </div>
     </div>

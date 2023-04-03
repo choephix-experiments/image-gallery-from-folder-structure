@@ -37,6 +37,18 @@ body {
   color: grey;
 }
 
+.Background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-size: cover;
+  opacity: 0.4;
+  /* -webkit-transition: background-image 0.2s ease-in-out;
+  transition: background-image 0.2s ease-in-out; */
+}
+
 .with-images {
   color: DodgerBlue;
   font-weight: bold;
@@ -45,6 +57,7 @@ body {
 .App h1 {
   padding: 8px;
   font-style: italic;
+  margin-bottom: 12px;
 }
 
 .divider {
@@ -54,38 +67,32 @@ body {
 }
 
 .content {
-  height:100%;
+  height: 100%;
   display: flex;
   justify-content: space-between;
   flex: 1 1 auto;
 }
 
 .panel {
-  height:100%;
+  height: 100%;
+  padding: 12px;
   background: #ffffff20;
   border: #0003 solid 1px;
   border-radius: 8px;
   overflow-y: auto;
   box-shadow: #0003 0px 0px 6px;
+
+  backdrop-filter: blur(50px);
+  -webkit-backdrop-filter: blur(50px);
 }
 
 .sidebar {
   text-align: left;
   flex: 0 0 280px;
-  overflow: hidden;
 }
 
 .gallery {
   flex: 1 1 auto;
-}
-
-.gallery-list {
-  /* display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 20px;
-  justify-content: center; */
-  margin: 20px;
 }
 
 .gallery img {
@@ -93,32 +100,50 @@ body {
   background: url('assets/chess.png');
   object-fit: cover;
   border-radius: 6px;
+  box-shadow: #0006 0px 2px 8px;
+  cursor: pointer;
+}
+
+.react_lightgallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 20px;
+  justify-content: center;
+}
+
+.react_lightgallery_item img {
+  height: 200px;
+  object-fit: cover;
+  min-width: 10px;
+  background: gray;
+  background: url("assets/chess.png");
+  border-radius: 8px;
+  border: white solid 2px;
   box-shadow: #0003 0px 1px 5px;
   cursor: pointer;
 }
 
 
 
-
-
-
-
-.panel::-webkit-scrollbar-track
-{
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-	border-radius: 10px;
-	background-color: #0000;
+.panel::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #0000;
 }
 
-.panel::-webkit-scrollbar
-{
-	width: 12px;
-	background-color: #0000;
+.panel::-webkit-scrollbar {
+  width: 12px;
+  background-color: #0000;
 }
 
-.panel::-webkit-scrollbar-thumb
-{
-	border-radius: 10px;
-	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
-	background-color: #0003;
+.panel::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #0003;
+}
+
+.MuiTreeItem-content  {
+  border-radius: 12px;
+  transition: background-color 0.2s ease-in-out;
 }
