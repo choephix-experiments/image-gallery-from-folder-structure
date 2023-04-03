@@ -203,7 +203,7 @@ function App() {
           {/**
            * VERSION 1
            **/}
-          {/* <h1>{defaultTitle}</h1>
+          <h1>{defaultTitle}</h1>
           <div className='gallery-list'>
             <PhotoAlbum
               layout={galleryItems.length < 5 ? 'masonry' : 'rows'}
@@ -211,11 +211,11 @@ function App() {
               onClick={handleImageClick}
               photos={galleryItems}
             />
-          </div> */}
+          </div>
           {/**
            * VERSION 2
            **/}
-          <LightgalleryProvider
+          {/* <LightgalleryProvider
             plugins={[window.lgZoom, window.lgThumbnail]}
             settings={{ mode: 'lg-fade', preload: 1 }}
           >
@@ -224,7 +224,7 @@ function App() {
                 <img src={item.thumb} alt='' />
               </LightgalleryItem>
             ))}
-          </LightgalleryProvider>
+          </LightgalleryProvider> */}
           {/**
            * VERSION 3
            **/}
