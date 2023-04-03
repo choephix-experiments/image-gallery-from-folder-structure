@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
 import 'lightgallery/css/lightgallery.css';
-import { LightgalleryProvider, LightgalleryItem } from 'react-lightgallery';
+import React, { useEffect, useState } from 'react';
+import './App.css';
 
-import TreeView from '@mui/lab/TreeView';
-import TreeItem from '@mui/lab/TreeItem';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import TreeItem from '@mui/lab/TreeItem';
+import TreeView from '@mui/lab/TreeView';
+
+import PhotoAlbum from 'react-photo-album';
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -41,10 +42,14 @@ const buildSidebar = (structure, nodeId, parentPath = '') => {
     if ('children' in item) {
       item.path = parentPath ? `${parentPath}/${item.name}` : item.name;
 
-      const folderStyle = folderContainsImage(item) ? { color: 'blue', fontWeight: 'bold' } : {};
+      const folderClassName = folderContainsImage(item) ? "with-images" : "";
 
       return (
-        <TreeItem key={itemId} nodeId={itemId} label={<span style={folderStyle}>{item.name}</span>}>
+        <TreeItem
+          key={itemId}
+          nodeId={itemId}
+          label={<span className={folderClassName}>{item.name}</span>}
+        >
           {buildSidebar(item, itemId, item.path)}
         </TreeItem>
       );
@@ -76,18 +81,16 @@ function App() {
   const [galleryItems, setGalleryItems] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(getCurrentPath());
 
-  window.history.pushState({}, '', currentFolder ? `/${currentFolder}` : '/');
+  // window.history.pushState({}, '', currentFolder ? `/${currentFolder}?${location.search}` : '/');
 
   useEffect(() => {
     fetchStructure().then(structure => {
-      // Assign paths to the structure nodes
       traverseTree(structure, [], (node, path) => {
         node.path = path.join('/');
       });
 
       setStructure(structure);
 
-      // If there's a current path, open the corresponding folder
       if (currentFolder) {
         const folderNode = findNodeByPath(structure, currentFolder);
         if (folderNode) {
@@ -103,11 +106,17 @@ function App() {
     if ('children' in folder) {
       folder.children.forEach(child => {
         if (!('children' in child)) {
+          if (!isSupportedImage(child.name)) {
+            return;
+          }
+
           const parentPath = folder.path.split('/');
           const path = [...parentPath, child.name];
           items.push({
             src: URL_BASE + path.join('/'),
             thumb: URL_BASE + path.join('/'),
+            width: child.width || 200,
+            height: child.height || 200,
           });
         }
       });
@@ -156,9 +165,13 @@ function App() {
 
   const defaultTitle = currentFolder || URL_BASE;
 
+  const handleImageClick = ({ photo }) => {
+    return navigator.clipboard.writeText(photo.src);
+  };
+
   return (
     <div className='App'>
-      <h1>{defaultTitle}</h1>
+      {/* <h1>{defaultTitle}</h1> */}
       <div className='content'>
         <div className='panel sidebar'>
           {structure && (
@@ -171,7 +184,6 @@ function App() {
                   handleFolderClick(node);
                 }
               }}
-              // Set the selected node in the sidebar based on the currentFolder
               selected={findNodeByPath(structure, currentFolder)?.id}
             >
               {buildSidebar(structure, '0')}
@@ -181,20 +193,12 @@ function App() {
         <div className='divider' />
         <div className='panel gallery'>
           <div className='gallery-list'>
-            <LightgalleryProvider
-              plugins={[window.lgZoom, window.lgThumbnail]}
-              settings={{ mode: 'lg-fade', preload: 1 }}
-            >
-              {galleryItems.map((item, index) => (
-                <LightgalleryItem
-                  key={currentFolder + '/' + index}
-                  src={item.src}
-                  thumb={item.thumb}
-                >
-                  <img src={item.thumb} alt='' />
-                </LightgalleryItem>
-              ))}
-            </LightgalleryProvider>
+            <PhotoAlbum
+              layout='rows'
+              targetRowHeight={240}
+              onClick={handleImageClick}
+              photos={galleryItems}
+            />
           </div>
         </div>
       </div>
