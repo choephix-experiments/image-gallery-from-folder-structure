@@ -59,15 +59,42 @@ const getCurrentPath = () => {
   return pathMatch ? pathMatch[1] : '';
 };
 
+const traverseTree = (node, path, callback) => {
+  const newPath = [...path, node.name];
+
+  callback(node, newPath);
+
+  if ('children' in node) {
+    node.children.forEach(child => {
+      traverseTree(child, newPath, callback);
+    });
+  }
+};
+
 function App() {
   const [structure, setStructure] = useState(null);
   const [galleryItems, setGalleryItems] = useState([]);
-  const [currentFolder, setCurrentFolder] = useState(null);
+  const [currentFolder, setCurrentFolder] = useState(getCurrentPath());
 
   window.history.pushState({}, '', currentFolder ? `/${currentFolder}` : '/');
 
   useEffect(() => {
-    fetchStructure().then(setStructure);
+    fetchStructure().then(structure => {
+      // Assign paths to the structure nodes
+      traverseTree(structure, [], (node, path) => {
+        node.path = path.join('/');
+      });
+
+      setStructure(structure);
+
+      // If there's a current path, open the corresponding folder
+      if (currentFolder) {
+        const folderNode = findNodeByPath(structure, currentFolder);
+        if (folderNode) {
+          handleFolderClick(folderNode);
+        }
+      }
+    });
   }, []);
 
   const handleFolderClick = folder => {
@@ -110,6 +137,23 @@ function App() {
     return result;
   };
 
+  const findNodeByPath = (node, targetPath) => {
+    if (node.path === targetPath) {
+      return node;
+    }
+
+    if ('children' in node) {
+      for (const child of node.children) {
+        const foundNode = findNodeByPath(child, targetPath);
+        if (foundNode) {
+          return foundNode;
+        }
+      }
+    }
+
+    return null;
+  };
+
   const defaultTitle = currentFolder || URL_BASE;
 
   return (
@@ -127,6 +171,8 @@ function App() {
                   handleFolderClick(node);
                 }
               }}
+              // Set the selected node in the sidebar based on the currentFolder
+              selected={findNodeByPath(structure, currentFolder)?.id}
             >
               {buildSidebar(structure, '0')}
             </TreeView>
@@ -140,7 +186,11 @@ function App() {
               settings={{ mode: 'lg-fade', preload: 1 }}
             >
               {galleryItems.map((item, index) => (
-                <LightgalleryItem key={index} src={item.src} thumb={item.thumb}>
+                <LightgalleryItem
+                  key={currentFolder + '/' + index}
+                  src={item.src}
+                  thumb={item.thumb}
+                >
                   <img src={item.thumb} alt='' />
                 </LightgalleryItem>
               ))}
