@@ -13,7 +13,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const URL_BASE = urlParams.get('host') ?? 'https://undroop.web.app/';
 const STRUCTURE_URL = URL_BASE + (URL_BASE.endsWith('/') ? '' : '/') + 'folder_structure.json';
 
-const SHOW_FILES = urlParams.get('files') == '' || !!JSON.parse(urlParams.get('files'));
+const SHOW_FILES = urlParams.get('files') === '' || !!JSON.parse(urlParams.get('files'));
 
 const fetchStructure = async () => {
   const response = await fetch(STRUCTURE_URL);
@@ -54,10 +54,17 @@ const buildSidebar = (structure, nodeId, parentPath = '') => {
   });
 };
 
+const getCurrentPath = () => {
+  const pathMatch = window.location.pathname.match(/^\/(.+)$/);
+  return pathMatch ? pathMatch[1] : '';
+};
+
 function App() {
   const [structure, setStructure] = useState(null);
   const [galleryItems, setGalleryItems] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(null);
+
+  window.history.pushState({}, '', currentFolder ? `/${currentFolder}` : '/');
 
   useEffect(() => {
     fetchStructure().then(setStructure);
@@ -80,7 +87,7 @@ function App() {
     }
 
     setGalleryItems(items);
-    setCurrentFolder(folder.name);
+    setCurrentFolder(folder.path);
   };
 
   const getNodeById = (structure, nodeId) => {
@@ -103,11 +110,13 @@ function App() {
     return result;
   };
 
+  const defaultTitle = currentFolder || URL_BASE;
+
   return (
     <div className='App'>
-      <h1>{currentFolder || 'Select a folder from the sidebar'}</h1>
+      <h1>{defaultTitle}</h1>
       <div className='content'>
-        <div className='sidebar'>
+        <div className='panel sidebar'>
           {structure && (
             <TreeView
               defaultCollapseIcon={<ExpandMoreIcon />}
@@ -123,17 +132,20 @@ function App() {
             </TreeView>
           )}
         </div>
-        <div className='gallery'>
-          <LightgalleryProvider
-            plugins={[window.lgZoom, window.lgThumbnail]}
-            settings={{ mode: 'lg-fade', preload: 1 }}
-          >
-            {galleryItems.map((item, index) => (
-              <LightgalleryItem key={index} src={item.src} thumb={item.thumb}>
-                <img src={item.thumb} alt='' />
-              </LightgalleryItem>
-            ))}
-          </LightgalleryProvider>
+        <div className='divider' />
+        <div className='panel gallery'>
+          <div className='gallery-list'>
+            <LightgalleryProvider
+              plugins={[window.lgZoom, window.lgThumbnail]}
+              settings={{ mode: 'lg-fade', preload: 1 }}
+            >
+              {galleryItems.map((item, index) => (
+                <LightgalleryItem key={index} src={item.src} thumb={item.thumb}>
+                  <img src={item.thumb} alt='' />
+                </LightgalleryItem>
+              ))}
+            </LightgalleryProvider>
+          </div>
         </div>
       </div>
     </div>

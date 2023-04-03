@@ -1,28 +1,54 @@
+html,
+body,
+#root,
+p {
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  height: 100dvh;
+}
+
 .App {
+  height:100%;
   text-align: center;
+  background: #dedede;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .content {
   display: flex;
   justify-content: space-between;
-  margin: 20px;
+  margin: 4px;
+  flex: 1 1 auto;
+}
+
+.divider {
+  width: 4px;
+  height: 4px;
+}
+
+.panel {
+  background: white;
+  border: #0003 solid 1px;
+  border-radius: 8px;
 }
 
 .sidebar {
   text-align: left;
-  outline: gray dashed 1px;
   flex: 0 0 280px;
+  overflow: hidden;
 }
 
 .gallery {
   flex: 1 1 auto;
-  outline: gray dashed 1px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 20px;
-  align-items: center;
-  justify-content: center;
+}
+
+.gallery-list {
+
 }
 
 .gallery img {
