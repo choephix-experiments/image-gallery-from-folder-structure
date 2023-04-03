@@ -1,5 +1,15 @@
 {
   "projects": {
     "default": "undroop"
-  }
+  },
+  "targets": {
+    "undroop": {
+      "hosting": {
+        "galleri": [
+          "galleri"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
