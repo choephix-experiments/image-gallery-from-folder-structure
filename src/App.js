@@ -8,7 +8,7 @@ import TreeItem from '@mui/lab/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-const urlParams = new URLSearchParams(queryString);
+const urlParams = new URLSearchParams(window.location.search);
 
 const URL_BASE = urlParams.get('host') ?? 'https://undroop.web.app/';
 const STRUCTURE_URL = URL_BASE + (URL_BASE.endsWith('/') ? '' : '/') + 'folder_structure.json';
