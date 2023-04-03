@@ -16,8 +16,16 @@ import Gallery from 'react-photo-gallery';
 
 const urlParams = new URLSearchParams(window.location.search);
 
-const URL_BASE = urlParams.get('host') ?? 'https://undroop.web.app/';
-const STRUCTURE_URL = URL_BASE + (URL_BASE.endsWith('/') ? '' : '/') + 'folder_structure.json';
+const URL_BASE = urlParams.get('host') ?? 'https://undroop.web.app';
+function urlWithBase(path) {
+  let base = URL_BASE;
+  if (!base.startsWith("https://") && base.startsWith("http://")) base = "https://" + base;
+  if (!base.endsWith('/')) base = base + "/";
+  return base + path;
+}
+
+const STRUCTURE_URL = urlWithBase('folder_structure.json');
+console.log({ STRUCTURE_URL });
 
 const SHOW_FILES = urlParams.get('files') === '' || !!JSON.parse(urlParams.get('files'));
 
@@ -118,9 +126,11 @@ function App() {
 
           const parentPath = folder.path.split('/');
           const path = [...parentPath, child.name];
+          const url = urlWithBase(path.join('/'));
+          console.log(url)
           items.push({
-            src: URL_BASE + path.join('/'),
-            thumb: URL_BASE + path.join('/'),
+            src: url,
+            thumb: url,
             width: child.width || 200,
             height: child.height || 200,
           });
@@ -169,15 +179,18 @@ function App() {
     return null;
   };
 
-  const defaultTitle = currentFolder || URL_BASE;
+  const defaultTitle = urlWithBase(currentFolder);
+  // window.title = defaultTitle;
 
   const handleImageClick = ({ photo }) => {
     setSelectedPhoto(photo);
     return navigator.clipboard.writeText(photo.src);
   };
 
-  const backgroundCss = selectedPhoto != null ? `url(${selectedPhoto.src})` : `none`; 
+  const backgroundCss = selectedPhoto != null ? `url(${selectedPhoto.src})` : `none`;
   console.log(selectedPhoto?.src, backgroundCss);
+  
+  console.log(galleryItems);
 
   return (
     <div className='App'>
@@ -203,7 +216,7 @@ function App() {
           {/**
            * VERSION 1
            **/}
-          <h1>{defaultTitle}</h1>
+          {/* <h1>{defaultTitle}</h1>
           <div className='gallery-list'>
             <PhotoAlbum
               layout={galleryItems.length < 5 ? 'masonry' : 'rows'}
@@ -211,11 +224,11 @@ function App() {
               onClick={handleImageClick}
               photos={galleryItems}
             />
-          </div>
+          </div> */}
           {/**
            * VERSION 2
            **/}
-          {/* <LightgalleryProvider
+          <LightgalleryProvider
             plugins={[window.lgZoom, window.lgThumbnail]}
             settings={{ mode: 'lg-fade', preload: 1 }}
           >
@@ -224,7 +237,7 @@ function App() {
                 <img src={item.thumb} alt='' />
               </LightgalleryItem>
             ))}
-          </LightgalleryProvider> */}
+          </LightgalleryProvider>
           {/**
            * VERSION 3
            **/}
