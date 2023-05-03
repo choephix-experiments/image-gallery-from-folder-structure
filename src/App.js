@@ -56,7 +56,7 @@ const buildSidebar = (structure, nodeId, parentPath = '') => {
       item.path = parentPath ? `${parentPath}/${item.name}` : item.name;
 
       const folderClassName = folderContainsImage(item) ? 'with-images' : '';
-      const hasSubfolders = item.children.some(c => c.children)
+      const hasSubfolders = item.children.some(c => c.children);
 
       return (
         <TreeItem
@@ -102,6 +102,13 @@ function App() {
     fetchStructure().then(structure => {
       traverseTree(structure, [], (node, path) => {
         node.path = path.join('/');
+        if ('children' in node) {
+          node.children.sort((a, b) => {
+            if ('children' in a && !('children' in b)) return -1;
+            if (!('children' in a) && 'children' in b) return 1;
+            return a.name.localeCompare(b.name);
+          });
+        }
       });
 
       setStructure(structure);
@@ -196,7 +203,7 @@ function App() {
       <div className='Background' style={{ background: backgroundCss }} key={backgroundCss} />
       <div className='content'>
         <div className='panel sidebar'>
-          {structure && (
+          {!structure ? null : (
             <TreeView
               defaultCollapseIcon={<ExpandMoreIcon />}
               defaultExpandIcon={<ChevronRightIcon />}
